@@ -1,0 +1,15 @@
+{
+  "mythxvsc.accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2OWVmODUyMC1iMWRhLTQwMTQtODY2My0wMTIwOTMyMDRlZmMiLCJpYXQiOjE2Nzk5OTI5NDkuMTcyLCJpc3MiOiJNeXRoWCBBdXRoIFNlcnZpY2UiLCJleHAiOjE5OTU1Njg5NDkuMTY5LCJ1c2VySWQiOiI2NDIyYTQzZjgyODhhYjNhMjlhMDYxNWEifQ.GBYvSxxPMMkDuJJJjxOPqOg5lxU2TCbzD2ItxqIVcEE",
+  "solidity.formatter": "forge",
+  "solidity.packageDefaultDependenciesDirectory": "lib",
+  "solidity.packageDefaultDependenciesContractsDirectory": "src",
+  "solidity.remappings": [
+    "ds-test/=lib/forge-std/lib/ds-test/src/",
+    "forge-std/=lib/forge-std/src/",
+    "openzeppelin-contracts/=lib/openzeppelin-contracts/"
+  ],
+  "editor.formatOnSave": true,
+  "[solidity]": {
+    "editor.defaultFormatter": "JuanBlanco.solidity"
+  },
+}

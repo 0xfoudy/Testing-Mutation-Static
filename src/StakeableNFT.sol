@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.13;
+pragma solidity 0.8.19;
 
 import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 
 contract StakeableNFT is ERC721 {
     uint256 public tokenSupply;
-    uint256 public constant MAX_SUPPLY = 10;
+    uint256 public constant MAX_SUPPLY = 20;
 
-    constructor() ERC721("StakeableNFT", "Steak"){
+    constructor() ERC721("StakeableNFT", "Steak") {
         tokenSupply = 0;
     }
 
@@ -17,7 +17,7 @@ contract StakeableNFT is ERC721 {
         ++tokenSupply;
     }
 
-    function _baseURI() internal pure override returns (string memory){
+    function _baseURI() internal pure override returns (string memory) {
         return "ipfs://QmZZzC4v7M6ZTYnuEgfA5qwHQUTm1DwRF8j3CQKtY6EXMF/";
     }
 }
