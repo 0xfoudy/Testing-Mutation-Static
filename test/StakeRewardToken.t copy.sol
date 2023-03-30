@@ -6,7 +6,7 @@ import "../src/StakeRewardToken.sol";
 
 contract StakeRewardTokenTest is Test {
     StakeRewardToken public stakeRewardToken;
-    uint256 decimals = 10 ** 18;
+    uint256 constant DECIMALS = 10 ** 18;
     address owner;
     address user1;
     address user2;
@@ -33,15 +33,15 @@ contract StakeRewardTokenTest is Test {
     function testTryMint() public {
         vm.expectRevert("not allowed to mint");
         vm.prank(user1);
-        stakeRewardToken.mintReward(1500 * decimals, user1);
+        stakeRewardToken.mintReward(1500 * DECIMALS, user1);
         stakeRewardToken.allowToMint(user1);
         vm.prank(user1);
-        stakeRewardToken.mintReward(1500 * decimals, user1);
-        assertEq(stakeRewardToken.totalSupply(), 1500 * decimals);
-        assertEq(stakeRewardToken.balanceOf(user1), 1500 * decimals);
+        stakeRewardToken.mintReward(1500 * DECIMALS, user1);
+        assertEq(stakeRewardToken.totalSupply(), 1500 * DECIMALS);
+        assertEq(stakeRewardToken.balanceOf(user1), 1500 * DECIMALS);
 
         stakeRewardToken.preventFromMinting(user1);
         vm.expectRevert("not allowed to mint");
-        stakeRewardToken.mintReward(1500 * decimals, user1);
+        stakeRewardToken.mintReward(1500 * DECIMALS, user1);
     }
 }

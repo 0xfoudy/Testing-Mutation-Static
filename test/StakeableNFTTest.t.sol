@@ -6,7 +6,6 @@ import "../src/StakeableNFT.sol";
 
 contract StakeableNFTTest is Test {
     StakeableNFT public stakeableNFT;
-    uint256 decimals = 10 ** 18;
     address owner;
     address user1;
     address user2;

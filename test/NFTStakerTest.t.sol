@@ -13,8 +13,7 @@ contract NFTStakerTest is Test {
     StakeRewardToken public stakeRewardToken;
     address owner;
     address user;
-    uint256 constant testTokenId = 0;
-    bytes32[] proof;
+    uint256 constant TEST_TOKEN_ID = 0;
 
     function setUp() public {
         owner = address(this);
@@ -50,7 +49,7 @@ contract NFTStakerTest is Test {
     function testWithdrawAfterDeposit() public {
         testDeposit();
         vm.prank(user);
-        stakingContract.withdrawNFT(testTokenId);
+        stakingContract.withdrawNFT(TEST_TOKEN_ID);
 
         assertEq(stakeableNFT.balanceOf(user), 1);
         assertEq(stakeableNFT.balanceOf(address(stakingContract)), 0);

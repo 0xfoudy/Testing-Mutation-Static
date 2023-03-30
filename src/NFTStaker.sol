@@ -15,7 +15,6 @@ contract NFTStaker is IERC721Receiver, Ownable {
     mapping(address => uint256[]) public addressToTokenIdMap;
     uint256[20] public rewardsPerDay = [10, 11, 13, 13, 12, 16, 17, 18, 14, 16, 10, 12, 13, 15, 13, 14, 11, 17, 17, 18];
     uint256 public constant _decimals = 18;
-    bool private isStakingTransfer = false;
 
     struct StakerInfo {
         address nftOwner;
