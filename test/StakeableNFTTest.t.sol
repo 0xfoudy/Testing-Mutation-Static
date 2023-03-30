@@ -32,4 +32,9 @@ contract StakeableNFTTest is Test {
         vm.expectRevert("Supply already at limit");
         stakeableNFT.mint();
     }
+
+    function testURI() public {
+        stakeableNFT.mint();
+        assertEq(stakeableNFT.tokenURI(0), "ipfs://QmZZzC4v7M6ZTYnuEgfA5qwHQUTm1DwRF8j3CQKtY6EXMF/0");
+    }
 }

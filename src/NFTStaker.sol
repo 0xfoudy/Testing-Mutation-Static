@@ -36,15 +36,6 @@ contract NFTStaker is IERC721Receiver, Ownable {
         return rewardsPerDay[tokenId];
     }
 
-    function depositNFT(uint256 tokenId) external {
-        //reentrancy protection
-        require(!isStakingTransfer);
-
-        isStakingTransfer = true;
-        stakeableNFT.safeTransferFrom(msg.sender, address(this), tokenId);
-        isStakingTransfer = false;
-    }
-
     function withdrawNFT(uint256 tokenId) external {
         require(getStakerInfo(tokenId).nftOwner == msg.sender, "Not original owner");
         delete tokenIdToStaker[tokenId];
@@ -52,8 +43,8 @@ contract NFTStaker is IERC721Receiver, Ownable {
         stakeableNFT.safeTransferFrom(address(this), msg.sender, tokenId);
     }
 
-    function collectTokenRewards(uint256 tokenId) internal {
-        require(getStakerInfo(tokenId).nftOwner == msg.sender, "claiming reward of an NFT not owned by sender");
+    function collectTokenRewards(uint256 tokenId) public {
+        require(getStakerInfo(tokenId).nftOwner == msg.sender, "Not original owner");
         (uint256 toGive, uint256 toRetain) = calculateReward(tokenId);
         tokenIdToStaker[tokenId].timeStaked = block.timestamp;
         tokenIdToStaker[tokenId].leftover = toRetain;
@@ -64,11 +55,6 @@ contract NFTStaker is IERC721Receiver, Ownable {
         for (uint256 i = 0; i < addressToTokenIdMap[msg.sender].length; ++i) {
             collectTokenRewards(addressToTokenIdMap[msg.sender][i]);
         }
-    }
-
-    function collectReward(uint256 tokenId) public {
-        require(getStakerInfo(tokenId).nftOwner == msg.sender, "claiming reward of an NFT not owned by sender");
-        collectTokenRewards(tokenId);
     }
 
     function calculateReward(uint256 tokenId) public view returns (uint256, uint256) {
@@ -86,11 +72,8 @@ contract NFTStaker is IERC721Receiver, Ownable {
         override
         returns (bytes4)
     {
-        // make sure we can only transfer the NFT collection we want
-        require(msg.sender == address(stakeableNFT), "Non acceptable NFT");
         // to prevent random NFTs to be sent
-        require(isStakingTransfer, "Please transfer the NFT through the staking function");
-        //originalOwner[tokenId] = from;
+        require(msg.sender == address(stakeableNFT), "Non acceptable NFT");
         tokenIdToStaker[tokenId].nftOwner = from;
         tokenIdToStaker[tokenId].timeStaked = block.timestamp;
         addressToTokenIdMap[from].push(tokenId);

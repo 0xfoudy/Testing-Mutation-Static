@@ -9,6 +9,7 @@ import "../src/StakeRewardToken.sol";
 contract NFTStakerTest is Test {
     NFTStaker public stakingContract;
     StakeableNFT public stakeableNFT;
+    StakeableNFT public nonStakeableNFT;
     StakeRewardToken public stakeRewardToken;
     address owner;
     address user;
@@ -19,6 +20,7 @@ contract NFTStakerTest is Test {
         owner = address(this);
         user = address(1);
         stakeableNFT = new StakeableNFT();
+        nonStakeableNFT = new StakeableNFT();
         stakeRewardToken = new StakeRewardToken();
         stakingContract = new NFTStaker(stakeableNFT, address(stakeRewardToken));
         stakeRewardToken.allowToMint(address(stakingContract));
@@ -29,19 +31,11 @@ contract NFTStakerTest is Test {
         assertEq(address(stakingContract.rewardToken()), address(stakeRewardToken));
     }
 
-    function testDepositWithoutApproval() public {
-        vm.startPrank(user);
-        stakeableNFT.mint();
-        vm.expectRevert("ERC721: caller is not token owner or approved");
-        stakingContract.depositNFT(testTokenId);
-        vm.stopPrank();
-    }
-
     function testDeposit() public {
         vm.startPrank(user);
         stakeableNFT.mint();
         stakeableNFT.approve(address(stakingContract), stakeableNFT.tokenSupply() - 1);
-        stakingContract.depositNFT(stakeableNFT.tokenSupply() - 1);
+        stakeableNFT.safeTransferFrom(user, address(stakingContract), stakeableNFT.tokenSupply() - 1);
         vm.stopPrank();
 
         assertEq(stakeableNFT.balanceOf(user), 0);
@@ -50,6 +44,8 @@ contract NFTStakerTest is Test {
         assertEq(stakingContract.getStakerInfo(tokenId).nftOwner, user);
         assertEq(stakingContract.getStakerInfo(tokenId).timeStaked, block.number);
     }
+
+    function testDepositWhileInProgress() public {}
 
     function testWithdrawAfterDeposit() public {
         testDeposit();
@@ -60,15 +56,10 @@ contract NFTStakerTest is Test {
         assertEq(stakeableNFT.balanceOf(address(stakingContract)), 0);
     }
 
-    function testTransferInsteadOfDeposit() public {
-        vm.startPrank(user);
-        stakeableNFT.mint();
-        vm.expectRevert("Please transfer the NFT through the staking function");
-        stakeableNFT.safeTransferFrom(user, address(stakingContract), 0);
-
-        assertEq(stakeableNFT.balanceOf(user), 1);
-        assertEq(stakeableNFT.balanceOf(address(stakingContract)), 0);
-        vm.stopPrank();
+    function testTransferWrongNFTCollection() public {
+        nonStakeableNFT.mint();
+        vm.expectRevert("Non acceptable NFT");
+        nonStakeableNFT.safeTransferFrom(owner, address(stakingContract), 0);
     }
 
     function testCollectRewardSingleToken() public {
@@ -76,13 +67,18 @@ contract NFTStakerTest is Test {
         stakeableNFT.mint();
         stakeableNFT.mint();
         stakeableNFT.mint();
-        stakeableNFT.approve(address(stakingContract), 2);
-        stakingContract.depositNFT(2);
+        stakeableNFT.safeTransferFrom(user, address(stakingContract), 2);
 
         vm.warp(block.timestamp + 60 * 60 * 24);
-        stakingContract.collectReward(2);
+        stakingContract.collectTokenRewards(2);
 
         assertEq(stakeRewardToken.balanceOf(user), 1 * stakingContract.getRewardPerDay(2) * 10 ** 18);
+    }
+
+    function testCollectOtherReward() public {
+        testDeposit();
+        vm.expectRevert("Not original owner");
+        stakingContract.collectTokenRewards(0);
     }
 
     function testWithdrawOthersNFT() public {
@@ -97,10 +93,10 @@ contract NFTStakerTest is Test {
         vm.startPrank(user);
         stakeableNFT.mint();
         stakeableNFT.approve(address(stakingContract), stakeableNFT.tokenSupply() - 1);
-        stakingContract.depositNFT(stakeableNFT.tokenSupply() - 1);
+        stakeableNFT.safeTransferFrom(user, address(stakingContract), stakeableNFT.tokenSupply() - 1);
         stakeableNFT.mint();
         stakeableNFT.approve(address(stakingContract), stakeableNFT.tokenSupply() - 1);
-        stakingContract.depositNFT(stakeableNFT.tokenSupply() - 1);
+        stakeableNFT.safeTransferFrom(user, address(stakingContract), stakeableNFT.tokenSupply() - 1);
         vm.stopPrank();
 
         vm.warp(block.timestamp + 60 * 60 * 24);
